@@ -1,1 +1,1 @@
-const API_BASE = "https://eazycarapi.up.railway.app";
+const API_BASE = "https://eazycar.onrender.com";
