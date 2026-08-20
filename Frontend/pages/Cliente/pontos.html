@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eazy Car - Entrar</title>
-    <link rel="stylesheet" href="../../CSS/ui.css">
+    <title>Pontos EazyCar</title>
     <link rel="stylesheet" href="../../CSS/style.css">
+    <link rel="stylesheet" href="../../CSS/ui.css">
     <script src="../../JS/config.js"></script>
-    <script src="../../JS/auth.js" defer></script>
+    <script src="../../JS/Cliente/pontos.js" defer></script>
 </head>
 
-<body id="login_cliente">
-    <!-- Header/Navbar -->
+<body>
     <header class="navbar">
         <div class="navbar-container">
             <div class="navbar-logo">
@@ -22,49 +21,42 @@
                 </a>
             </div>
             <nav class="navbar-menu">
-                <a href="../../index.html" class="nav-link active">Início</a>
+                <a href="../../index.html" class="nav-link">Início</a>
                 <a href="../../pages/minhas_reservas.html" class="nav-link">Reservas</a>
                 <a href="../../pages/veiculos.html" class="nav-link">Frotas</a>
-                <a href="../../pages/Cliente/pontos.html" class="nav-link">Pontos</a>
-                <a href="../../pages/Cliente/login.html" class="nav-link">Conta</a>
+                <a href="pontos.html" class="nav-link active">Pontos</a>
+                <a href="conta.html" class="nav-link">Conta</a>
             </nav>
-            <div class="navbar-auth">
-                <a href="../../pages/Cliente/login.html" class="btn-login" id="btn_login">Entrar</a>
-                <a href="../../pages/Cliente/cadastro.html" class="btn-signup" id="btn_cadastro">Cadastre-se</a>
-            </div>
         </div>
     </header>
 
-    <main class="auth-wrapper">
-        <section class="auth-box">
-            <header class="auth-header">
-                <div class="logo">EC</div>
-                <h1 class="auth-title">Eazy Car</h1>
-                <p class="auth-subtitle">Acesse sua Conta</p>
-            </header>
-
-            <form class="card" onsubmit="event.preventDefault(); autenticar_login();">
-                <div class="field">
-                    <label for="email">Email</label>
-                    <input type="email" placeholder="usuario@exemplo.com" id="email" required>
-                </div>
-
-                <div class="field" style="margin-top:16px;">
-                    <label for="senha">Senha</label>
-                    <input type="password" placeholder="********" id="senha" required>
-                </div>
-
-                <button class="btn" type="submit">Entrar</button>
-
-                <p class="auth-footer">
-                    Não tem uma conta?
-                    <a href="cadastro.html">Criar Conta</a>
-                </p>
-            </form>
+    <main class="container" style="margin-top: 40px; min-height: 70vh;">
+        <section class="fidelity-hero">
+            <div>
+                <h2>Programa de Pontos</h2>
+                <p>Alugue, acumule e troque por voucher de abastecimento. Carros populares valem 30 pontos e carros de luxo valem 50. A cada 5 pontos, você tem R$ 1,00.</p>
+            </div>
+            <div>
+                <div class="fidelity-balance" id="saldo_pontos">0</div>
+                <p>pontos · equivalente a <strong id="saldo_reais">R$ 0,00</strong></p>
+            </div>
         </section>
+
+        <h2>Trocar por voucher de abastecimento</h2>
+        <p>Use o código no posto parceiro para abastecer o próximo carro.</p>
+        <div class="voucher-grid" id="lista_opcoes_voucher"></div>
+
+        <h2>Meus vouchers</h2>
+        <div class="voucher-list" id="lista_vouchers">
+            <p>Carregando...</p>
+        </div>
+
+        <h2>Histórico de pontos</h2>
+        <div class="history-list" id="lista_historico">
+            <p>Carregando...</p>
+        </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-column">
@@ -92,7 +84,6 @@
             <p>&copy; 2026 EazyCar. Todos os direitos reservados. | Desenvolvido por EazyCar</p>
         </div>
     </footer>
-
 </body>
 
 </html>

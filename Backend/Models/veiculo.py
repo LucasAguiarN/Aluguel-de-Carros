@@ -1,4 +1,5 @@
 from .data_base import db
+from Backend.fidelidade import pontos_por_categoria
 
 
 class Veiculo(db.Model):
@@ -16,6 +17,7 @@ class Veiculo(db.Model):
     categoria    = db.Column(db.String(30), nullable=True)
     valor_diaria = db.Column(db.Float, nullable=False, default=150.0)
     status       = db.Column(db.String(20), nullable=False, default="Available")
+    imagem       = db.Column(db.String(255), nullable=True)
 
     def para_dicionario(self):
         return {
@@ -30,4 +32,6 @@ class Veiculo(db.Model):
             "categoria":     self.categoria,
             "valor_diaria":  self.valor_diaria,
             "status":        self.status,
+            "imagem":        self.imagem,
+            "pontos_fidelidade": pontos_por_categoria(self.categoria),
         }

@@ -1,10 +1,11 @@
 from flask import jsonify, request, make_response
 from flask_jwt_extended import create_access_token, get_jwt_identity
 from sqlalchemy import or_
-import bcrypt
 from Backend.Models.data_base import db
 from Backend.Models.cliente import Cliente
+from Backend.Models.pontos import MovimentacaoPontos, VoucherAbastecimento
 from Backend.decorators import cliente_required, funcionario_required
+from Backend.auth_senha import hash_senha, verificar_senha
 
 class ClienteController:
 
@@ -30,7 +31,7 @@ class ClienteController:
         if cliente_existente:
             return jsonify({"mensagem": "CPF ou email já cadastrado!"}), 409
 
-        hashed_password = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = hash_senha(senha)
         try:
             novo_cliente = Cliente(
                 nome=nome,
@@ -78,7 +79,7 @@ class ClienteController:
             return jsonify({"mensagem": "Email e senha são obrigatórios!"}), 400
 
         cliente = Cliente.query.filter_by(email=email).first()
-        if cliente and bcrypt.checkpw(senha.encode('utf-8'), cliente.senha.encode('utf-8')):
+        if cliente and verificar_senha(senha, cliente.senha):
             token = create_access_token(identity=str(cliente.id), additional_claims={"role": "cliente"})
             return make_response(jsonify({
                 "mensagem": "Login realizado com sucesso",
@@ -134,6 +135,8 @@ class ClienteController:
             return jsonify({"mensagem": "Cliente não encontrado!"}), 404
 
         try:
+            MovimentacaoPontos.query.filter_by(cliente_id=current_id).delete()
+            VoucherAbastecimento.query.filter_by(cliente_id=current_id).delete()
             db.session.delete(cliente)
             db.session.commit()
         except Exception:

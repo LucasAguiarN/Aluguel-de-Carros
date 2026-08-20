@@ -104,6 +104,7 @@ async function cadastrarVeiculo(event) {
     categoria:    document.getElementById("categoria").value || null,
     valor_diaria: parseFloat(document.getElementById("valor_diaria").value),
     status:       document.getElementById("status").value,
+    imagem:       document.getElementById("imagem") ? document.getElementById("imagem").value : null,
   };
 
   try {
@@ -153,6 +154,7 @@ async function carregarVeiculos() {
     for (const v of json) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
+        <td>${v.imagem ? `<img src="${v.imagem}" alt="${v.marca} ${v.modelo}" class="vehicle-thumb">` : "—"}</td>
         <td>${v.marca}</td>
         <td>${v.modelo}</td>
         <td>${v.ano}</td>
@@ -277,6 +279,9 @@ async function carregarVeiculoParaEdicao() {
     document.getElementById("categoria").value    = json.categoria    || "";
     document.getElementById("valor_diaria").value = json.valor_diaria || "";
     document.getElementById("status").value       = json.status       || "Available";
+    if (document.getElementById("imagem")) {
+      document.getElementById("imagem").value     = json.imagem       || "";
+    }
   } catch (e) {
     console.error(e);
     alert(e.message);
@@ -303,6 +308,7 @@ async function salvarEdicaoVeiculo(event) {
     categoria:    document.getElementById("categoria").value || null,
     valor_diaria: parseFloat(document.getElementById("valor_diaria").value),
     status:       document.getElementById("status").value,
+    imagem:       document.getElementById("imagem") ? document.getElementById("imagem").value : null,
   };
 
   try {

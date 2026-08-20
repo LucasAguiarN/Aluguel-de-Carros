@@ -1,10 +1,10 @@
 from flask import jsonify, request, make_response
 from flask_jwt_extended import create_access_token, get_jwt_identity
 from sqlalchemy import or_
-import bcrypt
 from Backend.Models.data_base import db
 from Backend.Models.funcionario import Funcionario
 from Backend.decorators import funcionario_required
+from Backend.auth_senha import hash_senha, verificar_senha
 
 class FuncionarioController:
 
@@ -27,7 +27,7 @@ class FuncionarioController:
         if funcionario_existente:
             return jsonify({"mensagem": "CPF ou email já cadastrado!"}), 409
 
-        hashed_password = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = hash_senha(senha)
         try:
             novo_funcionario = Funcionario(
                 nome=nome,
@@ -72,7 +72,7 @@ class FuncionarioController:
             return jsonify({"mensagem": "Email e senha são obrigatórios!"}), 400
 
         funcionario = Funcionario.query.filter_by(email=email).first()
-        if funcionario and bcrypt.checkpw(senha.encode('utf-8'), funcionario.senha.encode('utf-8')):
+        if funcionario and verificar_senha(senha, funcionario.senha):
             token = create_access_token(identity=str(funcionario.id), additional_claims={"role": "funcionario"})
             return make_response(jsonify({
                 "mensagem": "Login realizado com sucesso",

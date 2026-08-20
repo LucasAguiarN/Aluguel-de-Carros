@@ -1,4 +1,5 @@
 from .data_base import db
+from Backend.fidelidade import reais_equivalentes
 
 class Cliente(db.Model):
 
@@ -14,6 +15,7 @@ class Cliente(db.Model):
     endereco = db.Column(db.String(100), nullable=False)
     numero = db.Column(db.Integer, nullable=False)
     complemento = db.Column(db.String(100), nullable=True)
+    pontos = db.Column(db.Integer, nullable=False, default=0)
 
     def para_dicionario(self):
         dados = {
@@ -25,6 +27,8 @@ class Cliente(db.Model):
             'cep': self.cep,
             'endereco' : self.endereco,
             'numero' : self.numero,
-            'complemento' : self.complemento
+            'complemento' : self.complemento,
+            'pontos': self.pontos or 0,
+            'valor_em_reais': reais_equivalentes(self.pontos or 0),
         }
         return dados

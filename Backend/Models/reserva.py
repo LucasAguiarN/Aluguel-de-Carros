@@ -16,6 +16,7 @@ class Reserva(db.Model):
     status = db.Column(db.String(20), nullable=False, default="Active")
     data_hora_check_in = db.Column(db.DateTime, nullable=True)
     data_hora_check_out = db.Column(db.DateTime, nullable=True)
+    pontos_ganhos = db.Column(db.Integer, nullable=True)
 
     def to_dict(self):
         return {
@@ -29,5 +30,6 @@ class Reserva(db.Model):
             'valor_total': self.valor_total,
             'status': self.status,
             'data_hora_check_in': self.data_hora_check_in.strftime('%Y-%m-%d %H:%M:%S') if self.data_hora_check_in else None,
-            'data_hora_check_out': self.data_hora_check_out.strftime('%Y-%m-%d %H:%M:%S') if self.data_hora_check_out else None
+            'data_hora_check_out': self.data_hora_check_out.strftime('%Y-%m-%d %H:%M:%S') if self.data_hora_check_out else None,
+            'pontos_ganhos': self.pontos_ganhos,
         }

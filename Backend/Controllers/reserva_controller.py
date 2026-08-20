@@ -5,7 +5,9 @@ from Backend.Models.data_base import db
 from Backend.Models.reserva import Reserva
 from Backend.Models.veiculo import Veiculo
 from Backend.Models.cliente import Cliente
+from Backend.Models.pontos import MovimentacaoPontos
 from Backend.decorators import cliente_required, funcionario_required
+from Backend.fidelidade import pontos_por_categoria, reais_equivalentes
 
 class ReservaController:
     @cliente_required
@@ -76,9 +78,13 @@ class ReservaController:
             if veiculo:
                 dados_reserva['veiculo_nome'] = f"{veiculo.marca} {veiculo.modelo}"
                 dados_reserva['veiculo_placa'] = veiculo.placa
+                dados_reserva['veiculo_categoria'] = veiculo.categoria
+                dados_reserva['veiculo_imagem'] = veiculo.imagem
             else:
                 dados_reserva['veiculo_nome'] = "Veículo Indisponível"
                 dados_reserva['veiculo_placa'] = "---"
+                dados_reserva['veiculo_categoria'] = None
+                dados_reserva['veiculo_imagem'] = None
                 
             resultado.append(dados_reserva)
             
@@ -132,9 +138,32 @@ class ReservaController:
             if veiculo:
                 veiculo.status = "Available"
 
+            pontos_creditados = 0
+            if reserva.pontos_ganhos is None:
+                cliente = Cliente.query.filter_by(id=cliente_id).first()
+                categoria = veiculo.categoria if veiculo else None
+                pontos_creditados = pontos_por_categoria(categoria)
+                reserva.pontos_ganhos = pontos_creditados
+                if cliente:
+                    cliente.pontos = (cliente.pontos or 0) + pontos_creditados
+                    veiculo_nome = f"{veiculo.marca} {veiculo.modelo}" if veiculo else "veículo"
+                    categoria_txt = categoria or "Popular"
+                    db.session.add(MovimentacaoPontos(
+                        cliente_id=cliente_id,
+                        reserva_id=reserva.id,
+                        tipo="credito",
+                        pontos=pontos_creditados,
+                        descricao=f"Locação de {veiculo_nome} ({categoria_txt})",
+                    ))
+
             db.session.commit()
 
-            return jsonify({"mensagem": "Check-out realizado com sucesso!", "reserva": reserva.to_dict()}), 200
+            return jsonify({
+                "mensagem": "Check-out realizado com sucesso!",
+                "reserva": reserva.to_dict(),
+                "pontos_ganhos": pontos_creditados or reserva.pontos_ganhos or 0,
+                "valor_em_reais": reais_equivalentes(pontos_creditados or reserva.pontos_ganhos or 0),
+            }), 200
 
         except Exception as e:
             db.session.rollback()

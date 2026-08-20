@@ -28,11 +28,12 @@ async function carregarFrotaParaClientes() {
             const div = document.createElement("div");
             div.className = "car-type-card";
             div.innerHTML = `
-                <div class="car-icon">🚗</div>
+                ${htmlFotoVeiculo(v.imagem, `${v.marca} ${v.modelo}`)}
                 <h3>${v.marca} ${v.modelo}</h3>
                 <p><strong>Ano:</strong> ${v.ano} &nbsp;|&nbsp; <strong>Placa:</strong> ${v.placa}</p>
                 ${detalhes ? `<p class="car-detalhes">${detalhes}</p>` : ""}
                 <p class="car-diaria">R$ ${diaria}<span>/dia</span></p>
+                <span class="points-badge">+${v.pontos_fidelidade || 30} pontos</span>
                 <button class="btn-find-cars" onclick="irParaReserva(${v.id})">
                     Alugar Agora
                 </button>

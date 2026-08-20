@@ -3,6 +3,7 @@ from Backend.Controllers.cliente_controller import ClienteController
 from Backend.Controllers.funcionario_controller import FuncionarioController
 from Backend.Controllers.veiculo_controller import VeiculoController
 from Backend.Controllers.reserva_controller import ReservaController
+from Backend.Controllers.pontos_controller import PontosController
 
 def configurar_rotas(app):
     
@@ -110,3 +111,16 @@ def configurar_rotas(app):
     @app.route('/relatorios/receitas', methods=['GET'])
     def relatorio_receitas():
         return ReservaController.relatorio_receitas()
+
+    ## Fidelidade
+    @app.route('/fidelidade/regras', methods=['GET'])
+    def regras_fidelidade():
+        return PontosController.regras()
+
+    @app.route('/clientes/pontos', methods=['GET'])
+    def extrato_pontos():
+        return PontosController.extrato()
+
+    @app.route('/clientes/pontos/resgatar', methods=['POST'])
+    def resgatar_pontos():
+        return PontosController.resgatar()

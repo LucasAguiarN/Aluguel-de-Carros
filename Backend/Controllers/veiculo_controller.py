@@ -24,6 +24,7 @@ class VeiculoController:
         combustivel = (dados.get("combustivel") or "").strip() or None
         transmissao = (dados.get("transmissao") or "").strip() or None
         categoria   = (dados.get("categoria")   or "").strip() or None
+        imagem      = (dados.get("imagem")      or "").strip() or None
         valor_diaria = dados.get("valor_diaria")
 
         if not marca or not modelo or not placa or ano is None or valor_diaria is None:
@@ -68,6 +69,7 @@ class VeiculoController:
                 categoria=categoria,
                 valor_diaria=valor_diaria,
                 status=status,
+                imagem=imagem,
             )
             db.session.add(veiculo)
             db.session.commit()
@@ -141,6 +143,8 @@ class VeiculoController:
             if cat and cat not in VeiculoController.CATEGORIAS_VALIDAS:
                 return jsonify({"mensagem": "Categoria inválida!"}), 400
             veiculo.categoria = cat or None
+        if "imagem" in dados:
+            veiculo.imagem = (dados.get("imagem") or "").strip() or None
         if "valor_diaria" in dados and dados.get("valor_diaria") is not None:
             try:
                 vd = float(dados.get("valor_diaria"))

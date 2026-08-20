@@ -330,6 +330,14 @@ input:focus {
   font-weight: 600;
 }
 
+.vehicle-thumb {
+  width: 88px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #eef1f4;
+}
+
 .tag {
   display: inline-block;
   border-radius: 999px;

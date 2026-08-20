@@ -68,6 +68,9 @@ async function carregar_dados() {
         document.getElementById("endereco_exibido").textContent = resposta.endereco;
         document.getElementById("numero_exibido").textContent = resposta.numero;
         document.getElementById("complemento_exibido").textContent = resposta.complemento;
+        const pontos = resposta.pontos || 0;
+        const reais = Number(resposta.valor_em_reais || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        document.getElementById("pontos_exibido").textContent = `${pontos} pontos (${reais})`;
 
     } catch (error) {
         console.error("Erro:", error);

@@ -54,11 +54,12 @@ async function carregarVeiculosDisponiveis() {
             div.dataset.vehicleId = v.id;
             div.dataset.valorDiaria = v.valor_diaria ?? 150;
             div.innerHTML = `
-                <div class="car-icon">🚗</div>
+                ${htmlFotoVeiculo(v.imagem, `${v.marca} ${v.modelo}`)}
                 <h3>${v.marca} ${v.modelo}</h3>
                 <p><strong>Ano:</strong> ${v.ano}</p>
                 <p><strong>Placa:</strong> ${v.placa}</p>
                 <p style="color: #e63946; font-weight: bold; margin-top: 10px;">Diária: R$ ${diaria}</p>
+                <span class="points-badge">+${v.pontos_fidelidade || 30} pontos no check-out</span>
 
                 <button class="btn-find-cars" style="margin-top: 15px; width: 100%;" onclick="reservarVeiculo(${v.id})">
                     Reservar Este
@@ -204,7 +205,7 @@ async function carregarMinhasReservas() {
             div.className = "car-type-card";
             div.style.borderTop = "4px solid #e63946";
             div.innerHTML = `
-                <div class="car-icon">🚗</div>
+                ${htmlFotoVeiculo(r.veiculo_imagem, r.veiculo_nome)}
                 <h3>${r.veiculo_nome}</h3>
                 <p><strong>Placa:</strong> ${r.veiculo_placa}</p>
                 <hr style="margin: 15px 0; border: 0.5px solid #eee;">
@@ -214,6 +215,7 @@ async function carregarMinhasReservas() {
                 <p style="color: #e63946; font-weight: bold; margin-top: 15px; font-size: 1.1em;">
                     Total Pago: R$ ${r.valor_total.toFixed(2)}
                 </p>
+                ${r.pontos_ganhos ? `<span class="points-badge">+${r.pontos_ganhos} pontos ganhos</span>` : ""}
                 <p style="margin-top: 10px; font-size: 0.9em; color: ${r.status === 'Active' ? 'green' : 'gray'};">
                     Status: <strong>${r.status}</strong>
                 </p>
@@ -281,7 +283,8 @@ async function realizarCheckOut(reservaId) {
 
         let resposta = await request.json();
         if (request.ok) {
-            alert(resposta.mensagem || 'Check-out realizado com sucesso!');
+            alert((resposta.mensagem || 'Check-out realizado com sucesso!') +
+                (resposta.pontos_ganhos ? `\nVocê ganhou ${resposta.pontos_ganhos} pontos (equivalente a R$ ${(resposta.valor_em_reais || 0).toFixed(2).replace('.', ',')}).` : ''));
             carregarMinhasReservas();
         } else {
             alert(resposta.mensagem || 'Erro ao realizar check-out.');
