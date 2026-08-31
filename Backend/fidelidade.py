@@ -13,7 +13,7 @@ PONTOS_POR_CATEGORIA = {
 
 PONTOS_PADRAO = 30
 
-PONTOS_AVALIACAO = 10  # bônus por avaliar a locação depois do check-out
+PONTOS_AVALIACAO = 5
 
 VOUCHERS_DISPONIVEIS = (
     {"valor_reais": 10, "pontos": 50, "descricao": "Voucher de abastecimento R$ 10"},
