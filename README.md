@@ -71,6 +71,30 @@ Projeto da Disciplina de Software Product: Analysis & Specification, ministrada 
 </table>
 
 <h2 id="requisitos">📦 Requisitos</h2>
+
+<h3>Como rodar localmente</h3>
+
+```
+docker compose up -d --build
+```
+
+Isso já sobe backend + MySQL local isolados, **sem precisar criar nenhum arquivo `.env`**. Não usa e não toca nas credenciais de produção (Aiven/Render) em nenhum momento. Acesse a API em `http://localhost:5000`.
+
+Pra rodar o frontend local apontando pra esse backend, sirva a pasta `Frontend/` com um servidor HTTP (não abra o `.html` direto com duplo-clique, o `config.js` só aponta pro backend local se o endereço for `localhost`):
+```
+cd Frontend
+python -m http.server 5500
+```
+Acesse `http://localhost:5500`.
+
+<h3>O que commitar</h3>
+
+| Arquivo | Commitar? |
+|---|---|
+| `.env.example` | ✅ sim — é template, sem segredo real |
+| `docker-compose.yml`, código em geral | ✅ sim |
+| `.env` | ❌ nunca — credenciais reais (Aiven/JWT de produção) |
+
 <h2 id="arquitetura">🧩 Arquitetura do Sistema</h2>
 <h2 id="how-it-works">⚙️ Funcionalidades</h2>
 <h2 id="interface">🖥️ Interface</h2>

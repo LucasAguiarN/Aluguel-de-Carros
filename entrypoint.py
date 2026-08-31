@@ -7,7 +7,7 @@ MYSQL_HOST     = os.environ.get("DB_HOST",     "mysql")
 MYSQL_PORT     = int(os.environ.get("DB_PORT", "3306"))
 MYSQL_USER     = os.environ.get("DB_USER",     "root")
 MYSQL_PASSWORD = os.environ.get("DB_PASSWORD", "")
-MYSQL_DATABASE = os.environ.get("DB_NAME",     "railway")
+MYSQL_DATABASE = os.environ.get("DB_NAME",     "eazycar")
 
 
 def wait_for_mysql(timeout: int = 120, interval: int = 2) -> None:
@@ -35,7 +35,22 @@ def wait_for_mysql(timeout: int = 120, interval: int = 2) -> None:
             time.sleep(interval)
 
 
+def modo_dev() -> bool:
+    return (
+        os.environ.get("FLASK_ENV") == "development"
+        or os.environ.get("FLASK_DEBUG", "").lower() == "true"
+    )
+
+
 if __name__ == "__main__":
     wait_for_mysql()
+
     port = os.environ.get("PORT", "5000")
-    os.execvp("gunicorn", ["gunicorn", "run:app", "--bind", f"0.0.0.0:{port}"])
+
+    if modo_dev():
+        # Dev local (docker-compose): servidor com reload automático a cada
+        # alteração de código — não usar em produção.
+        os.execvp("flask", ["flask", "run", "--host", "0.0.0.0", "--port", port, "--debug"])
+    else:
+        # Produção (Render): gunicorn.
+        os.execvp("gunicorn", ["gunicorn", "run:app", "--bind", f"0.0.0.0:{port}"])
