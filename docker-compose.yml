@@ -2,37 +2,46 @@ services:
   mysql:
     image: mysql:8.0.29
     restart: unless-stopped
-    container_name: mysql
+    container_name: eazycar-mysql-local
     ports:
       - "127.0.0.1:3308:3306"
-    env_file:
-      - .env
     environment:
-      MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      # Credenciais de uso local
+      MYSQL_ROOT_PASSWORD: docker_local_dev
+      MYSQL_DATABASE: eazycar_dev
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pdocker_local_dev"]
       timeout: 5s
       retries: 10
       interval: 10s
       start_period: 60s
+
   web:
     build:
-      context: . 
+      context: .
       dockerfile: dockerfile
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     volumes:
       - .:/app
     environment:
       FLASK_APP: run.py
       FLASK_ENV: development
+      FLASK_DEBUG: "true"
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: docker_local_dev
+      DB_NAME: eazycar_dev
+      DB_SSL_CA: ""
+      JWT_SECRET_KEY: dev-docker-local-secret
+      FRONTEND_URL: "*"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
 volumes:
   db-data:
