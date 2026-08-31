@@ -205,19 +205,11 @@ async function carregarMinhasReservas() {
                 actionButton = `<button class="btn-find-cars" style="margin-top: 15px; width: 100%;" onclick="realizarCheckOut(${r.id})">Check-out</button>`;
             }
 
-            let avaliacaoHtml = '';
-            if (r.status === 'Concluído') {
-                avaliacaoHtml = r.avaliada
-                    ? `<div class="avaliacao-box"><span class="avaliacao-feita">✓ Você já avaliou esta locação</span></div>`
-                    : `
-                        <div class="avaliacao-box">
-                            <p style="margin-bottom: 8px;"><strong>Avalie sua locação:</strong></p>
-                            ${htmlEstrelasInput(r.id)}
-                            <textarea id="comentario_${r.id}" placeholder="Conte como foi a experiência (opcional)"></textarea>
-                            <button class="btn-find-cars" style="width: 100%;" onclick="enviarAvaliacao(${r.id})">Enviar avaliação</button>
-                        </div>
-                    `;
-            }
+            // A avaliação é pedida uma única vez, logo após o check-out (ver perguntarAvaliacao)
+            // — aqui só um indicador passivo pra quem já avaliou, sem convite pra fazer de novo.
+            let avaliacaoHtml = (r.status === 'Concluído' && r.avaliada)
+                ? `<div class="avaliacao-box"><span class="avaliacao-feita">✓ Você avaliou esta locação</span></div>`
+                : '';
 
             let div = document.createElement("div");
             div.className = "car-type-card";
@@ -305,6 +297,7 @@ async function realizarCheckOut(reservaId) {
             alert((resposta.mensagem || 'Check-out realizado com sucesso!') +
                 (resposta.pontos_ganhos ? `\nVocê ganhou ${resposta.pontos_ganhos} pontos (equivalente a R$ ${(resposta.valor_em_reais || 0).toFixed(2).replace('.', ',')}).` : ''));
             carregarMinhasReservas();
+            perguntarAvaliacao(reservaId);
         } else {
             alert(resposta.mensagem || 'Erro ao realizar check-out.');
         }
@@ -333,6 +326,40 @@ function selecionarNota(reservaId, nota) {
     });
 }
 
+// Pergunta a avaliação uma única vez, logo após o check-out ser confirmado.
+// Sem fallback: se o cliente disser "não" (ou ignorar), não tem mais convite
+// pra avaliar essa reserva depois — é um convite único, não um lembrete.
+function perguntarAvaliacao(reservaId) {
+    const quer = confirm('Quer avaliar sua locação? Você ganha pontos de fidelidade por isso!');
+    if (!quer) return;
+    abrirModalAvaliacao(reservaId);
+}
+
+function abrirModalAvaliacao(reservaId) {
+    fecharModalAvaliacao();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'modal_avaliacao';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-box">
+            <h3>Avalie sua locação</h3>
+            ${htmlEstrelasInput(reservaId)}
+            <textarea id="comentario_${reservaId}" placeholder="Conte como foi a experiência (opcional)"></textarea>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn-find-cars" style="flex: 1;" onclick="enviarAvaliacao(${reservaId})">Enviar avaliação</button>
+                <button class="btn-secondary" style="flex: 1;" onclick="fecharModalAvaliacao()">Agora não</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+function fecharModalAvaliacao() {
+    const overlay = document.getElementById('modal_avaliacao');
+    if (overlay) overlay.remove();
+}
+
 async function enviarAvaliacao(reservaId) {
     const nota = notasSelecionadas[reservaId];
     if (!nota) {
@@ -359,6 +386,7 @@ async function enviarAvaliacao(reservaId) {
         if (request.ok) {
             alert(`Obrigado pela avaliação! Você ganhou ${resposta.pontos_ganhos} pontos de fidelidade.`);
             delete notasSelecionadas[reservaId];
+            fecharModalAvaliacao();
             carregarMinhasReservas();
         } else {
             alert(resposta.mensagem || 'Erro ao enviar avaliação.');
