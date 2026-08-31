@@ -10,6 +10,7 @@ from Backend.Models.funcionario import Funcionario  # noqa: F401
 from Backend.Models.cliente import Cliente  # noqa: F401
 from Backend.Models.reserva import Reserva  # noqa: F401
 from Backend.Models.pontos import MovimentacaoPontos, VoucherAbastecimento  # noqa: F401
+from Backend.Models.avaliacao import Avaliacao  # noqa: F401
 from Backend.routes import configurar_rotas
 
 load_dotenv()
@@ -22,8 +23,7 @@ def create_app():
     CORS(app, origins=frontend_url, supports_credentials=True)
 
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY") or "dev-secret-local"
-    # Para ambiente de desenvolvimento: evita expirar o token em 15 minutos.
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
     jwt = JWTManager(app)
 
     iniciar_db(app)

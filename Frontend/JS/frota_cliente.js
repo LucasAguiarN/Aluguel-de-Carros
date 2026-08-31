@@ -24,6 +24,9 @@ async function carregarFrotaParaClientes() {
             ].filter(Boolean).join("");
 
             const diaria = (v.valor_diaria ?? 150).toFixed(2).replace(".", ",");
+            const mediaHtml = v.avaliacao_media
+                ? `<span class="avg-rating">★ ${v.avaliacao_media.toFixed(1).replace(".", ",")}</span>`
+                : "";
 
             const div = document.createElement("div");
             div.className = "car-type-card";
@@ -34,6 +37,7 @@ async function carregarFrotaParaClientes() {
                 ${detalhes ? `<p class="car-detalhes">${detalhes}</p>` : ""}
                 <p class="car-diaria">R$ ${diaria}<span>/dia</span></p>
                 <span class="points-badge">+${v.pontos_fidelidade || 30} pontos</span>
+                ${mediaHtml}
                 <button class="btn-find-cars" onclick="irParaReserva(${v.id})">
                     Alugar Agora
                 </button>

@@ -13,6 +13,8 @@ PONTOS_POR_CATEGORIA = {
 
 PONTOS_PADRAO = 30
 
+PONTOS_AVALIACAO = 5
+
 VOUCHERS_DISPONIVEIS = (
     {"valor_reais": 10, "pontos": 50, "descricao": "Voucher de abastecimento R$ 10"},
     {"valor_reais": 20, "pontos": 100, "descricao": "Voucher de abastecimento R$ 20"},

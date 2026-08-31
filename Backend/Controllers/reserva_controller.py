@@ -6,6 +6,7 @@ from Backend.Models.reserva import Reserva
 from Backend.Models.veiculo import Veiculo
 from Backend.Models.cliente import Cliente
 from Backend.Models.pontos import MovimentacaoPontos
+from Backend.Models.avaliacao import Avaliacao
 from Backend.decorators import cliente_required, funcionario_required
 from Backend.fidelidade import pontos_por_categoria, reais_equivalentes
 
@@ -70,11 +71,17 @@ class ReservaController:
         cliente_id = int(get_jwt_identity())
 
         reservas = Reserva.query.filter_by(cliente_id=cliente_id).order_by(Reserva.id.desc()).all()
-        
+
+        reservas_avaliadas = {
+            a.reserva_id
+            for a in Avaliacao.query.filter_by(cliente_id=cliente_id).all()
+        }
+
         resultado = []
         for r in reservas:
             veiculo = Veiculo.query.filter_by(id=r.veiculo_id).first()
             dados_reserva = r.to_dict()
+            dados_reserva['avaliada'] = r.id in reservas_avaliadas
             if veiculo:
                 dados_reserva['veiculo_nome'] = f"{veiculo.marca} {veiculo.modelo}"
                 dados_reserva['veiculo_placa'] = veiculo.placa

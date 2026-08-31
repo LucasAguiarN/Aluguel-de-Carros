@@ -47,6 +47,9 @@ async function carregarVeiculosDisponiveis() {
             let isSelected = selectedVehicleId && Number(selectedVehicleId) === v.id;
             let highlight = isSelected ? 'border: 3px solid #e63946; box-shadow: 0 0 20px rgba(230, 57, 70, 0.15);' : '';
             const diaria = (v.valor_diaria ?? 150).toFixed(2).replace(".", ",");
+            const mediaHtml = v.avaliacao_media
+                ? `<span class="avg-rating">★ ${v.avaliacao_media.toFixed(1).replace(".", ",")}</span>`
+                : "";
 
             let div = document.createElement("div");
             div.className = "car-type-card";
@@ -60,6 +63,7 @@ async function carregarVeiculosDisponiveis() {
                 <p><strong>Placa:</strong> ${v.placa}</p>
                 <p style="color: #e63946; font-weight: bold; margin-top: 10px;">Diária: R$ ${diaria}</p>
                 <span class="points-badge">+${v.pontos_fidelidade || 30} pontos no check-out</span>
+                ${mediaHtml}
 
                 <button class="btn-find-cars" style="margin-top: 15px; width: 100%;" onclick="reservarVeiculo(${v.id})">
                     Reservar Este
@@ -201,6 +205,10 @@ async function carregarMinhasReservas() {
                 actionButton = `<button class="btn-find-cars" style="margin-top: 15px; width: 100%;" onclick="realizarCheckOut(${r.id})">Check-out</button>`;
             }
 
+            let avaliacaoHtml = (r.status === 'Concluído' && r.avaliada)
+                ? `<div class="avaliacao-box"><span class="avaliacao-feita">✓ Você avaliou esta locação</span></div>`
+                : '';
+
             let div = document.createElement("div");
             div.className = "car-type-card";
             div.style.borderTop = "4px solid #e63946";
@@ -220,6 +228,7 @@ async function carregarMinhasReservas() {
                     Status: <strong>${r.status}</strong>
                 </p>
                 ${actionButton}
+                ${avaliacaoHtml}
             `;
             container.appendChild(div);
         });
@@ -286,12 +295,100 @@ async function realizarCheckOut(reservaId) {
             alert((resposta.mensagem || 'Check-out realizado com sucesso!') +
                 (resposta.pontos_ganhos ? `\nVocê ganhou ${resposta.pontos_ganhos} pontos (equivalente a R$ ${(resposta.valor_em_reais || 0).toFixed(2).replace('.', ',')}).` : ''));
             carregarMinhasReservas();
+            perguntarAvaliacao(reservaId);
         } else {
             alert(resposta.mensagem || 'Erro ao realizar check-out.');
         }
     } catch (error) {
         console.error('Erro no check-out:', error);
         alert('Falha de conexão ao realizar check-out.');
+    }
+}
+
+const notasSelecionadas = {};
+
+function htmlEstrelasInput(reservaId) {
+    let estrelas = '';
+    for (let i = 1; i <= 5; i++) {
+        estrelas += `<span class="star" data-nota="${i}" onclick="selecionarNota(${reservaId}, ${i})">★</span>`;
+    }
+    return `<div class="stars-input" id="stars_${reservaId}">${estrelas}</div>`;
+}
+
+function selecionarNota(reservaId, nota) {
+    notasSelecionadas[reservaId] = nota;
+    const container = document.getElementById(`stars_${reservaId}`);
+    if (!container) return;
+    [...container.children].forEach(star => {
+        star.classList.toggle('selected', Number(star.dataset.nota) <= nota);
+    });
+}
+
+function perguntarAvaliacao(reservaId) {
+    const quer = confirm('Quer avaliar sua locação? Você ganha pontos de fidelidade por isso!');
+    if (!quer) return;
+    abrirModalAvaliacao(reservaId);
+}
+
+function abrirModalAvaliacao(reservaId) {
+    fecharModalAvaliacao();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'modal_avaliacao';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+        <div class="modal-box">
+            <h3>Avalie sua locação</h3>
+            ${htmlEstrelasInput(reservaId)}
+            <textarea id="comentario_${reservaId}" placeholder="Conte como foi a experiência (opcional)"></textarea>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn-find-cars" style="flex: 1;" onclick="enviarAvaliacao(${reservaId})">Enviar avaliação</button>
+                <button class="btn-secondary" style="flex: 1;" onclick="fecharModalAvaliacao()">Agora não</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+}
+
+function fecharModalAvaliacao() {
+    const overlay = document.getElementById('modal_avaliacao');
+    if (overlay) overlay.remove();
+}
+
+async function enviarAvaliacao(reservaId) {
+    const nota = notasSelecionadas[reservaId];
+    if (!nota) {
+        alert('Selecione de 1 a 5 estrelas antes de enviar.');
+        return;
+    }
+
+    const comentarioEl = document.getElementById(`comentario_${reservaId}`);
+    const comentario = comentarioEl ? comentarioEl.value.trim() : '';
+    const token = localStorage.getItem('token_cliente');
+
+    try {
+        let request = await fetch(`${API_BASE}/reservas/${reservaId}/avaliacao`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ nota, comentario })
+        });
+
+        let resposta = await request.json();
+
+        if (request.ok) {
+            alert(`Obrigado pela avaliação! Você ganhou ${resposta.pontos_ganhos} pontos de fidelidade.`);
+            delete notasSelecionadas[reservaId];
+            fecharModalAvaliacao();
+            carregarMinhasReservas();
+        } else {
+            alert(resposta.mensagem || 'Erro ao enviar avaliação.');
+        }
+    } catch (error) {
+        console.error('Erro ao enviar avaliação:', error);
+        alert('Falha de conexão ao enviar avaliação.');
     }
 }
 
