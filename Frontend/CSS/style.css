@@ -703,6 +703,59 @@ body {
     color: #2c3e50;
 }
 
+/* Avaliação pós-locação */
+.avg-rating {
+    display: inline-block;
+    margin-top: 10px;
+    background: #fff8e1;
+    color: #b8860b;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.avaliacao-box {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+    text-align: left;
+}
+
+.avaliacao-box .avaliacao-feita {
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 0.9em;
+}
+
+.stars-input {
+    display: flex;
+    gap: 4px;
+    font-size: 26px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.stars-input .star {
+    color: #ddd;
+    transition: color 0.15s;
+}
+
+.stars-input .star.selected {
+    color: #ffb400;
+}
+
+.avaliacao-box textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 60px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+}
+
 @media (max-width: 900px) {
     .fidelity-hero,
     .voucher-grid {

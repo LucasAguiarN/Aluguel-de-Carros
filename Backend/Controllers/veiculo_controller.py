@@ -1,7 +1,9 @@
 from flask import jsonify, request
+from sqlalchemy import func
 
 from Backend.Models.data_base import db
 from Backend.Models.veiculo import Veiculo
+from Backend.Models.avaliacao import Avaliacao
 from Backend.decorators import funcionario_required
 
 
@@ -189,7 +191,21 @@ class VeiculoController:
     @staticmethod
     def listar_veiculos_disponiveis():
         veiculos = Veiculo.query.filter_by(status="Available").all()
-        return jsonify([v.para_dicionario() for v in veiculos]), 200
+
+        medias = dict(
+            db.session.query(Avaliacao.veiculo_id, func.avg(Avaliacao.nota))
+            .group_by(Avaliacao.veiculo_id)
+            .all()
+        )
+
+        resultado = []
+        for v in veiculos:
+            dados = v.para_dicionario()
+            media = medias.get(v.id)
+            dados['avaliacao_media'] = round(float(media), 1) if media is not None else None
+            resultado.append(dados)
+
+        return jsonify(resultado), 200
     
 
 

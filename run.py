@@ -10,6 +10,7 @@ from Backend.Models.funcionario import Funcionario  # noqa: F401
 from Backend.Models.cliente import Cliente  # noqa: F401
 from Backend.Models.reserva import Reserva  # noqa: F401
 from Backend.Models.pontos import MovimentacaoPontos, VoucherAbastecimento  # noqa: F401
+from Backend.Models.avaliacao import Avaliacao  # noqa: F401
 from Backend.routes import configurar_rotas
 
 load_dotenv()

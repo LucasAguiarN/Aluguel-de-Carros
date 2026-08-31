@@ -4,6 +4,7 @@ from Backend.Controllers.funcionario_controller import FuncionarioController
 from Backend.Controllers.veiculo_controller import VeiculoController
 from Backend.Controllers.reserva_controller import ReservaController
 from Backend.Controllers.pontos_controller import PontosController
+from Backend.Controllers.avaliacao_controller import AvaliacaoController
 
 def configurar_rotas(app):
     
@@ -111,6 +112,15 @@ def configurar_rotas(app):
     @app.route('/relatorios/receitas', methods=['GET'])
     def relatorio_receitas():
         return ReservaController.relatorio_receitas()
+
+    ## Avaliação pós-locação
+    @app.route('/reservas/<int:reserva_id>/avaliacao', methods=['POST'])
+    def criar_avaliacao(reserva_id):
+        return AvaliacaoController.criar_avaliacao(reserva_id)
+
+    @app.route('/veiculos/<int:veiculo_id>/avaliacoes', methods=['GET'])
+    def listar_avaliacoes_veiculo(veiculo_id):
+        return AvaliacaoController.listar_avaliacoes_veiculo(veiculo_id)
 
     ## Fidelidade
     @app.route('/fidelidade/regras', methods=['GET'])
