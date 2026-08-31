@@ -205,8 +205,6 @@ async function carregarMinhasReservas() {
                 actionButton = `<button class="btn-find-cars" style="margin-top: 15px; width: 100%;" onclick="realizarCheckOut(${r.id})">Check-out</button>`;
             }
 
-            // A avaliação é pedida uma única vez, logo após o check-out (ver perguntarAvaliacao)
-            // — aqui só um indicador passivo pra quem já avaliou, sem convite pra fazer de novo.
             let avaliacaoHtml = (r.status === 'Concluído' && r.avaliada)
                 ? `<div class="avaliacao-box"><span class="avaliacao-feita">✓ Você avaliou esta locação</span></div>`
                 : '';
@@ -326,9 +324,6 @@ function selecionarNota(reservaId, nota) {
     });
 }
 
-// Pergunta a avaliação uma única vez, logo após o check-out ser confirmado.
-// Sem fallback: se o cliente disser "não" (ou ignorar), não tem mais convite
-// pra avaliar essa reserva depois — é um convite único, não um lembrete.
 function perguntarAvaliacao(reservaId) {
     const quer = confirm('Quer avaliar sua locação? Você ganha pontos de fidelidade por isso!');
     if (!quer) return;
