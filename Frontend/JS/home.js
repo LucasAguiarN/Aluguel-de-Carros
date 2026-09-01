@@ -99,6 +99,15 @@ function initializeLocationAutocomplete() {
             dropoffSuggestions.innerHTML = '';
         }
     });
+
+    document.addEventListener('click', function (e) {
+        if (!pickupLocationInput.contains(e.target) && !pickupSuggestions.contains(e.target)) {
+            pickupSuggestions.innerHTML = '';
+        }
+        if (!dropoffLocationInput.contains(e.target) && !dropoffSuggestions.contains(e.target)) {
+            dropoffSuggestions.innerHTML = '';
+        }
+    });
 }
 
 // Exibe as sugestões de localização

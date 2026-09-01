@@ -48,7 +48,7 @@ async function carregarVeiculosDisponiveis() {
             let highlight = isSelected ? 'border: 3px solid #e63946; box-shadow: 0 0 20px rgba(230, 57, 70, 0.15);' : '';
             const diaria = (v.valor_diaria ?? 150).toFixed(2).replace(".", ",");
             const mediaHtml = v.avaliacao_media
-                ? `<span class="avg-rating">★ ${v.avaliacao_media.toFixed(1).replace(".", ",")}</span>`
+                ? `<span class="avg-rating" onclick="verAvaliacoes(${v.id})">★ ${v.avaliacao_media.toFixed(1).replace(".", ",")}</span>`
                 : "";
 
             let div = document.createElement("div");
@@ -343,7 +343,7 @@ function abrirModalAvaliacao(reservaId) {
             <textarea id="comentario_${reservaId}" placeholder="Conte como foi a experiência (opcional)"></textarea>
             <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <button class="btn-find-cars" style="flex: 1;" onclick="enviarAvaliacao(${reservaId})">Enviar avaliação</button>
-                <button class="btn-secondary" style="flex: 1;" onclick="fecharModalAvaliacao()">Agora não</button>
+                <button class="btn-secondary" style="flex: 1;" onclick="fecharModalAvaliacao()">Cancelar</button>
             </div>
         </div>
     `;
@@ -429,6 +429,17 @@ function initializeLocationAutocomplete() {
             const filtered = locations.filter(loc => loc.toLowerCase().includes(value));
             displaySuggestions(filtered, dropoffSuggestions, dropoffLocationInput);
         } else {
+            dropoffSuggestions.innerHTML = '';
+        }
+    });
+
+    // Fecha as sugestões ao clicar fora do campo/lista — sem isso, a lista
+    // aberta ficava sobrepondo os campos de data logo abaixo.
+    document.addEventListener('click', function (e) {
+        if (!pickupLocationInput.contains(e.target) && !pickupSuggestions.contains(e.target)) {
+            pickupSuggestions.innerHTML = '';
+        }
+        if (!dropoffLocationInput.contains(e.target) && !dropoffSuggestions.contains(e.target)) {
             dropoffSuggestions.innerHTML = '';
         }
     });

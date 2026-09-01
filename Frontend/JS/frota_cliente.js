@@ -25,7 +25,7 @@ async function carregarFrotaParaClientes() {
 
             const diaria = (v.valor_diaria ?? 150).toFixed(2).replace(".", ",");
             const mediaHtml = v.avaliacao_media
-                ? `<span class="avg-rating">★ ${v.avaliacao_media.toFixed(1).replace(".", ",")}</span>`
+                ? `<span class="avg-rating" onclick="verAvaliacoes(${v.id})">★ ${v.avaliacao_media.toFixed(1).replace(".", ",")}</span>`
                 : "";
 
             const div = document.createElement("div");
