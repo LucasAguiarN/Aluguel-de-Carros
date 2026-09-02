@@ -5,6 +5,7 @@ from Backend.Models.data_base import db
 from Backend.Models.avaliacao import Avaliacao
 from Backend.Models.reserva import Reserva
 from Backend.Models.cliente import Cliente
+from Backend.Models.veiculo import Veiculo
 from Backend.Models.pontos import MovimentacaoPontos
 from Backend.decorators import cliente_required
 from Backend.fidelidade import PONTOS_AVALIACAO
@@ -51,12 +52,14 @@ class AvaliacaoController:
             cliente = Cliente.query.filter_by(id=cliente_id).first()
             if cliente:
                 cliente.pontos = (cliente.pontos or 0) + PONTOS_AVALIACAO
+                veiculo = Veiculo.query.filter_by(id=reserva.veiculo_id).first()
+                veiculo_nome = f"{veiculo.marca} {veiculo.modelo}" if veiculo else "veículo"
                 db.session.add(MovimentacaoPontos(
                     cliente_id=cliente_id,
                     reserva_id=reserva.id,
                     tipo="credito",
                     pontos=PONTOS_AVALIACAO,
-                    descricao=f"Avaliação da locação (nota {nota_int})",
+                    descricao=f"Avaliação da locação de {veiculo_nome}",
                 ))
 
             db.session.commit()
